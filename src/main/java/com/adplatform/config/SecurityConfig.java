@@ -3,6 +3,7 @@ package com.adplatform.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -41,6 +42,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/api-docs/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/api/placements/*/serve").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/banners/*/view").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/banners/*/click").permitAll()
                 .anyRequest().authenticated()
             )
             .authenticationProvider(provider)

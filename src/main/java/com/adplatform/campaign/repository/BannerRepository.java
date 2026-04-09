@@ -8,8 +8,13 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface BannerRepository extends JpaRepository<Banner, Long> {
+
     List<Banner> findByCampaignId(Long campaignId);
+
     List<Banner> findByCampaignIdAndActiveTrue(Long campaignId);
+
+    @Query("SELECT b FROM Banner b WHERE b.campaign.user.id = :userId AND b.active = true ORDER BY b.createdAt DESC")
+    List<Banner> findByUserId(@Param("userId") Long userId);
 
     @Query("""
         SELECT b FROM Banner b
