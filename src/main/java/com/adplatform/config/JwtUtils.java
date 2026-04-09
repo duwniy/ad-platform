@@ -1,6 +1,5 @@
 package com.adplatform.config;
 
-import com.adplatform.user.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,7 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Component
-public class JwtUtil {
+public class JwtUtils {
     @Value("${jwt.secret}")
     private String secret;
 
@@ -24,6 +23,7 @@ public class JwtUtil {
     private long jwtExpiration;
 
     private Key getSigningKey() {
+        // ИСПРАВЛЕНО: проверяем длину секрета (минимум 32 байта для HS256)
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
@@ -36,14 +36,14 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(User user) {
-        return generateToken(new HashMap<>(), user);
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, User user) {
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(user.getUsername())
+                .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS256)

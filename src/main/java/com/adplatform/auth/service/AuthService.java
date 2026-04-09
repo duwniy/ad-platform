@@ -3,7 +3,7 @@ package com.adplatform.auth.service;
 import com.adplatform.auth.dto.AuthResponse;
 import com.adplatform.auth.dto.LoginRequest;
 import com.adplatform.auth.dto.RegisterRequest;
-import com.adplatform.config.JwtUtil;
+import com.adplatform.config.JwtUtils; // ИСПРАВЛЕНО: JwtUtil -> JwtUtils
 import com.adplatform.shared.exception.BusinessException;
 import com.adplatform.user.entity.Role;
 import com.adplatform.user.entity.User;
@@ -13,13 +13,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional // ИСПРАВЛЕНО: добавлена транзакционность
 public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
 
     public AuthResponse register(RegisterRequest request) {
@@ -34,7 +36,7 @@ public class AuthService {
             .active(true)
             .build();
         userRepository.save(user);
-        String token = jwtUtil.generateToken(user);
+        String token = jwtUtils.generateToken(user);
         return AuthResponse.builder()
             .token(token)
             .email(user.getEmail())
@@ -49,7 +51,7 @@ public class AuthService {
         );
         User user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new BusinessException("User not found"));
-        String token = jwtUtil.generateToken(user);
+        String token = jwtUtils.generateToken(user);
         return AuthResponse.builder()
             .token(token)
             .email(user.getEmail())
